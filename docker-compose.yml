@@ -14,7 +14,11 @@ services:
       redis:
         condition: service_started
     command: >
-      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+      sh -c "
+            python manage.py wait_db &&
+            python manage.py migrate && 
+            python manage.py runserver 0.0.0.0:8000
+      "
     restart: on-failure
 
   celery:
@@ -31,12 +35,26 @@ services:
       sh -c "celery -A config worker -l info"
     restart: on-failure
 
+  celery-beat:
+    build:
+      context: .
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    command: >
+      sh -c "celery -A config beat -l info"
+    restart: on-failure
+
   db:
     image: mysql:8
     env_file:
       - .env
     ports:
-      - "3308:3306"   # щоб не конфліктував із 3307
+      - "3308:3306"
     volumes:
       - ./mysql:/var/lib/mysql
     healthcheck:
