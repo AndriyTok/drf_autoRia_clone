@@ -3,16 +3,16 @@ from enum import Enum
 
 class ActionTokenEnum(Enum):
     ACTIVATE = (
-        "activate",
+        'activate',
         timedelta(minutes=30),
     )
     RECOVERY = (
-        "recovery",
+        'recovery',
         timedelta(minutes=10),
     )
     SOCKET = (
-        "socket",
-        timedelta(minutes=10),
+        'socket',
+        timedelta(seconds=30),
     )
 
     def __init__(self, token_type, lifetime):
